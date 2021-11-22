@@ -1,0 +1,13 @@
+// to get to know information about the Block device which u have:
+	-> lsblk
+	
+// to get the old configuration u can copy the old configuration .config and then make oldconfig
+// when u build the kernel u get "vmlinux" which is the kernel
+	- Image : vmlinux in binary formated
+	- zImage : is compressed image
+	- uImage : zimage plud 64 byte U-boot header
+	
+// u can build the module but u need to install them.
+
+// clean : remove object
+// disclean: remove .config and path files.
