@@ -1,13 +1,42 @@
-// to get to know information about the Block device which u have:
-	-> lsblk
-	
-// to get the old configuration u can copy the old configuration .config and then make oldconfig
-// when u build the kernel u get "vmlinux" which is the kernel
-	- Image : vmlinux in binary formated
-	- zImage : is compressed image
-	- uImage : zimage plud 64 byte U-boot header
-	
-// u can build the module but u need to install them.
+- Linux is the kernel u can change every thing but as long as the kernel is the same then u have linux
+- kernel has device drives, memory managment, process managment, etc
+kernel itself cannot do much as simple function like open file is not supported in the kernel. it is supported in c library which is not part of the kernel 
 
-// clean : remove object
-// disclean: remove .config and path files.
+- compiler : turn human readable source code into machine readable object. GCC is the compiler for linux 
+ gcc -c main.c -> this step is used to convert the .c to .o file the result is main.o
+ the compiler for c++ is g++ 
+-c means only generate object file. do not try to execute it 
+-i  is used to tell the compiler where to search for header file 
+-D is used to define macros on the command line interface 
+    - ex:
+        - g++ -c -D NDEBUG=3 mycode.cpp
+
+- linking:
+    - -o is used to link files 
+    - to link with library use -lnameOfLibrary 
+    - compiler add lib at the beginging and .a at the end
+    - compiler search for library in /lib and /usr/lib. to add another path for linker for library user -L/library_path
+
+- command line interface:
+    - the first argument passed to the software is the name of the file which is executed  
+    - arguments are divided in options and other argument 
+        - options:
+            - short: signle hyphen and single char after it 
+            - long: two hyphena and a word 
+    - parsing the command line using getopt_long which tell the valid option which might be provided to the program
+    - ho:v means h and o are valid options while v is a valid option which is followed by argument  
+    - to provide the option for the command line interface use struct option which has the name of the option,takes argument or not, short name 
+    - every time u call getopt_long it parse a single option and return the short option or -1 if the input is not option
+    - normally u call it on loop and switch statment 
+    - optarg points to the text of that argument 
+    - optind points to the first no option argument
+
+- make:
+    - the goal of make is to allow the building process to happen automatically 
+    - make works with the concept of target and rules
+    - in order to automate the process u have to create Makefile 
+    - in order to exeute the make file u have to write call make 
+
+- system call is usually request to the operating system (kernel) to do hardware operation 
+- linux IPC (inter process communication) provide a way so that the process can communicate with another process ex: PIPES, FIFO
+	- PIPE u connect standard output of a process to the standard input of another process 
