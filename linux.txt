@@ -2,21 +2,6 @@
 - kernel has device drives, memory managment, process managment, etc
 kernel itself cannot do much as simple function like open file is not supported in the kernel. it is supported in c library which is not part of the kernel 
 
-- compiler : turn human readable source code into machine readable object. GCC is the compiler for linux 
- gcc -c main.c -> this step is used to convert the .c to .o file the result is main.o
- the compiler for c++ is g++ 
--c means only generate object file. do not try to execute it 
--i  is used to tell the compiler where to search for header file 
--D is used to define macros on the command line interface 
-    - ex:
-        - g++ -c -D NDEBUG=3 mycode.cpp
-
-- linking:
-    - -o is used to link files 
-    - to link with library use -lnameOfLibrary 
-    - compiler add lib at the beginging and .a at the end
-    - compiler search for library in /lib and /usr/lib. to add another path for linker for library user -L/library_path
-
 - command line interface:
     - the first argument passed to the software is the name of the file which is executed  
     - arguments are divided in options and other argument 
@@ -31,12 +16,107 @@ kernel itself cannot do much as simple function like open file is not supported 
     - optarg points to the text of that argument 
     - optind points to the first no option argument
 
+
+- system call is usually request to the operating system (kernel) to do hardware operation 
+- linux IPC (inter process communication) provide a way so that the process can communicate with another process ex: PIPES, FIFO
+	- PIPE u connect standard output of a process to the standard input of another process 
+
+- enviroment:
+    - linux provides each runnung programming witn variable
+    - HOME refere to user home directory 
+    - PATH where linux search for command invoked 
+    - u can export variable using export command export x=12
+    - to get enviroment variable from c program use getenv("nameOfVariable");
+
+- assert(condition):
+    - if the condition is not true the program would exit 
+
+
+- compiler : turn human readable source code into machine readable object. GCC is the compiler for linux 
+ gcc -c main.c -> this step is used to convert the .c to .o file the result is main.o
+ the compiler for c++ is g++ 
+-c means only generate object file. do not try to link it 
+-i  is used to tell the compiler where to search for header file 
+-D is used to define macros on the command line interface 
+    - ex:
+        - g++ -c -D NDEBUG=3 mycode.cpp
+
+- linking:
+    - -o is used to link files 
+    - to link with library use -lnameOfLibrary 
+    - compiler add lib at the beginging and .a at the end
+    - compiler search for library in /lib and /usr/lib. to add another path for linker for library user -L/library_path
+    - gcc -o nameOfExe main.o app1.o app2.o
+    
 - make:
     - the goal of make is to allow the building process to happen automatically 
     - make works with the concept of target and rules
     - in order to automate the process u have to create Makefile 
     - in order to exeute the make file u have to write call make 
 
-- system call is usually request to the operating system (kernel) to do hardware operation 
-- linux IPC (inter process communication) provide a way so that the process can communicate with another process ex: PIPES, FIFO
-	- PIPE u connect standard output of a process to the standard input of another process 
+
+- shared library:
+    - known also as shared object 
+    - the software would only include reference to the functions which are used in the shared library not the code itself
+    - to create a shared library:
+        - gcc -c fPIC name.c  -> that would tell the compiler that this name.o would be used as a part of shared library
+        - gcc -shared -fPIC -o libtest.so name.o name2.o -> create shared library from thoses objects files
+        - gcc -o app app.o -L. -ltest  -> to link against this library
+    
+    - linker:
+        - linker search for shared library in /lib and /usr/lib
+        - to tell the loader to search for the library in another place also use -WL,-rpath while compile the software as
+        the linker only has the name of the shared library sp this option let the loader get the library when the application 
+        start
+        - gcc -o app app.o -L. -ltest -WL,rpath,/usr/local/lib -> when running the program the loader would load the library
+        from /usr/local/lib
+
+- process:  
+    - ps: display the process that are running on the system    
+    - each process has process if which is of type pid_t 
+    - a process can get it"s id using getpid() system call
+    - a process can get the pid of it"s parent using getppid()
+    - to kill a process u have to send SIGTERM singal to the process 
+    - process termination:
+        - the process call exit 
+        - the process get SIGTERM : kill -KILL pid -> send KILL signal to the process which has the pid 
+- threads:
+    - u call pthread_create which take pthread_t variable to store the thread id 
+    - thread function is normally from type void* (*)(void *)
+    - u can pass structure to the thread and then typecast it to the data u want to have
+    - pthread_join it is used to make the thread wait on the other thread
+    - attributes:
+        - it is a way to fine-tuning the behavior of the threads
+        - pthread_attr_t object which has the properities of the thread
+        - pthread_attr_init 
+        - u can decide that the thread is detached meaning u do not need to call wait to release the the resources of the thread
+
+- race condition:
+    - pthread_mutex_t job_queue_mutex;
+    - pthread_mutex_init (&job_queue_mutex, NULL);
+    - pthread_mutex_lock (&job_queue_mutex)
+    - pthread_mutex_unlock (&job_queue_mutex)
+
+- IPC:
+    - shared memory process shared data by reading and writing
+    - mapped memory read and write using file
+    - socket allow communication in different domain
+    - pipe sequenial data exchange
+    - fifo unrelated process can communicate
+
+- memory model:
+    - virtual memory are split in pages
+    - each process has a mapping from it is memory address to the virtal memory page
+    - in linux each page size is 4KB
+    - process allocate memory using shmget which use key
+        - IPC_CREAT: create new page
+        - IPC_EXCL: filed if the key already exists 
+    - to attach the memory to a process:
+        - shmat would attach the memory
+        - shmdt : to detach the memory
+    - shmctl:
+        - u can use to delete the memory using IPC_RMID 
+- Map a file:
+    - process communicate via file 
+    - linux split the file into chunks and then copies them into virtual mempory
+    - mmap map a file to a process memory 
